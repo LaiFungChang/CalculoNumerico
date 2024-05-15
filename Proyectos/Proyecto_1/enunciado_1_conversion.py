@@ -1,7 +1,6 @@
 import flet as ft
-
 #Estilo del boton
-class MyButton(ft.ElevatedButton):
+class boton_stilo(ft.ElevatedButton):
     def __init__(self, text, on_click,width):
         super().__init__()
         self.bgcolor = '#006BBA'
@@ -10,10 +9,8 @@ class MyButton(ft.ElevatedButton):
         self.on_click = on_click
         self.width =width
         
-
-
 #code display the code
-def main(page: ft.Page):
+def main_enunciado_1(page: ft.Page):
     #parametros de la pagina
     page.title = "Convertidor de bases" #title of the page
     page.window_resizable = False
@@ -24,8 +21,12 @@ def main(page: ft.Page):
     page.padding =0
     page.window_center()
 
-    #button function
-
+    #funciones
+    def validacionInput(e): #validacion de entrada: solo permite el ingreso de numeros enteros del 0-9
+        if (e.control.value != ''):
+            if not(e.control.value[-1] in ['0','1','2','3','4','5','6','7','8','9']):
+                e.control.value =e.control.value[:-1]
+                e.control.update()
 
     def conversor(e): #convierte los numeros
         """
@@ -49,40 +50,41 @@ def main(page: ft.Page):
                 n=4
             elif valores.value=="OCT":
                 n=8
-            
+
+            #PROCEDIMIENTO DE CAMBIO DE BASE
             numero = int(txt_number.value) #convierte el textField en int
             lista = [] #almacena el numero que se convertira
             
             while(numero > 0): #ciclo donde se convierte numero deseado
                 lista.append(str(numero % n)) #agrega resto a la lista
                 numero //= n #calcula cociente
-
-             
+       
             result.value = ''.join(lista[::-1]) # [::-1] orden inverso
             result.update() #actualiza resultado obtenido
 
         elif valores.value=="HEX" and (txt_number.value != ""):
-            n=16
-            result.value = hex(int(txt_number.value))[2:].upper() #conversion a hexadecimal
-            
-       
-        #ELSE cuando no se ingrese nada MENSAJE  PEDIENTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-        page.update() #actualiza pagina
+                n=16
+                result.value = hex(int(txt_number.value))[2:].upper() #conversion a hexadecimal
+
+    #valida cuando el input= textField esta vacio y responde con un mensaje de error
+        else:
+            txt_number.error_text="No a ingresado un número" #mensaje de error
+        page.update()#actualiza la pagina
 
     def limpiar(e): #limpia informacion
         txt_number.read_only = False #permite que se edite el input
-        txt_number.value = "0" #limpia input
-        result.value ="0" #limpia output
+        txt_number.value = "" #limpia input
+        result.value ="" #limpia output
         page.update() #actualiza la pagina
 
     #VARIABLES
-    txt_number = ft.TextField(value="0", text_align=ft.TextAlign.RIGHT, width=150,label="Ingresa un numero")
-    result = ft.TextField(value="0",text_align=ft.TextAlign.RIGHT,width=260)  #respuesta de operacion
+    txt_number = ft.TextField(hint_text="0", text_align=ft.TextAlign.RIGHT, width=150,label="Ingresa un numero", on_change=validacionInput)
+    result = ft.TextField(hint_text="0",text_align=ft.TextAlign.RIGHT,width=260)  #respuesta de operacion
     result.read_only =True #no se puede editar 
     valores = ft.Dropdown(
                     value="BIN", #valor predeterminado binario
                     width=100,
-                    options=[
+                    options=[ #BASES
                         ft.dropdown.Option("BIN"),
                         ft.dropdown.Option("Base 3"),
                         ft.dropdown.Option("Base 4"),
@@ -90,56 +92,46 @@ def main(page: ft.Page):
                         ft.dropdown.Option("HEX"),
                     ],
                 )
-
-    page.add( #diseño de pagina 1
-        ft.Container(
+    #DISEÑO DE VENTANA 1: Enunciado 1
+    page.add( 
+        ft.Container( #container Principal
+                #Propiedades externas 
                 gradient= ft.LinearGradient(begin=ft.alignment.top_left,end=ft.alignment.top_right,colors=['#006BBA','#0E9DBC']),
                 width=page.window_width,
                 height=page.window_height,
-                padding=ft.padding.symmetric(vertical=50,horizontal=45),
-
-                content=ft.Container(
+                padding=ft.padding.symmetric(vertical=50,horizontal=45), 
+                content=ft.Container( #container secundario
+                        #propiedades internas del container 2
                         bgcolor="white",
                         border_radius=10,
-                        padding= ft.padding.only(top=35),
+                        padding= ft.padding.only(top=30),
                         margin= ft.margin.all(60),
                         content= ft.Column([
-                                ft.Row(
+                                    ft.Text("          Conversor de Bases",size=25,text_align=ft.TextAlign.CENTER,weight=ft.FontWeight.BOLD),
+                                    ft.Text(""), #espacio 
+                                    ft.Row(
                                     [
-                                        
-                                        ft.IconButton(ft.icons.KEYBOARD_RETURN,
-                                                      padding=ft.padding.only(left=30))
-                                    ]
-                                ),
-                               
-                                ft.Text("          Conversor de Bases",size=25,text_align=ft.TextAlign.CENTER,weight=ft.FontWeight.BOLD),
-                                ft.Text(""), #espacio 
-                                ft.Row(
-                                [
-                                    txt_number,
-                                    valores
-                                ],
-                                alignment=ft.MainAxisAlignment.CENTER,
-                                ),      
-
-                                ft.Row(
-                                    [
-                                        result
+                                        txt_number,
+                                        valores
                                     ],
                                     alignment=ft.MainAxisAlignment.CENTER,
-                                ),
-                                ft.Text(""), #espacio
-                                ft.Row(
-                                    [
-                                        ft.IconButton(ft.icons.CLEANING_SERVICES, on_click=limpiar),
-                                        MyButton(text="Calcular", on_click=conversor, width=135)
-                                    ],
-                                    alignment=ft.MainAxisAlignment.SPACE_EVENLY,
+                                    ),      
+                                    ft.Row(
+                                        [
+                                            result
+                                        ],
+                                        alignment=ft.MainAxisAlignment.CENTER,
+                                    ),
+                                    ft.Text(""), #espacio
+                                    ft.Row(
+                                        [
+                                            ft.IconButton(ft.icons.CLEANING_SERVICES, on_click=limpiar),
+                                            boton_stilo(text="Calcular", on_click=conversor, width=135)
+                                        ],
+                                        alignment=ft.MainAxisAlignment.SPACE_EVENLY,
+                                    ),
+                                ]),
                             ),
-                        ]),
                 ),
-        ),
-
-        #FALTAN VALIDACIONES
     )
-ft.app(main)
+ft.app(main_enunciado_1)
